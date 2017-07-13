@@ -1,6 +1,6 @@
 describe('index', () => {
   const express = require('express');
-  let use, index;
+  let use, target;
   const routerAssertions = [
     { endpoint: '/list', mock: jest.fn(), path: '../src/router/list' }
   ];
@@ -8,7 +8,7 @@ describe('index', () => {
   beforeAll(() => {
     routerAssertions.forEach(assertion => jest.mock(assertion.path, () => assertion.mock));
     use = jest.spyOn(express.Router, 'use');
-    index = require('../index');
+    target = require('../index');
   });
 
   describe('routers', () => {
@@ -20,7 +20,7 @@ describe('index', () => {
   });
 
   test('exports an express.Router', () => {
-    expect(index).toBeInstanceOf(express.Router().constructor);
+    expect(target).toBeInstanceOf(express.Router().constructor);
   });
 
 });
