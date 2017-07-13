@@ -2,7 +2,7 @@ const AWS = require('aws-sdk');
 
 const cloudwatch = new AWS.CloudWatch({
   apiVersion: '2010-08-01',
-  region: 'eu-west-2'
+  region: 'eu-west-2'       // TODO this should be from a settings object.....
 });
 
 module.exports = {
