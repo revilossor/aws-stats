@@ -3,16 +3,25 @@ describe('list', () => {
   const express = require('express'),
     request = require('supertest');
 
-  let app, target, json, status;
+  let app, target, json, status, mockCloudwatchList, mockCloudwatchListFails;
 
   const mockValidNamespaces = {
     MockNamespace: 'validNamespace'
   };
 
-  const mockCloudwatchList = jest.fn();
+  const mockMetrics = {
+    Metrics: 'mockMetrics'
+  };
 
   beforeAll(() => {
     jest.mock('../../src/data/namespaces', () => (mockValidNamespaces));
+
+    mockCloudwatchListFails = false;
+    mockCloudwatchList = jest.fn().mockImplementation(() => {
+      return new Promise((resolve, reject) => {
+        (mockCloudwatchListFails) ? reject(new Error('mockError')) : resolve(mockMetrics);
+      });
+    });
 
     jest.mock('../../src/aws/cloudwatch', () => ({
       list: mockCloudwatchList
@@ -30,6 +39,7 @@ describe('list', () => {
 
   afterEach(() => {
     status.mockClear();
+    json.mockClear();
   });
 
   describe('/ route', () => {
@@ -57,11 +67,19 @@ describe('list', () => {
         done();
       });
     });
+    test('responds with Metrics when promise resolves', (done) => {
+      request(app).get('/validNamespace').then(() => {
+        expect(json).toHaveBeenCalledWith('mockMetrics');
+        done();
+      });
+    });
+    test.only('responds with status 500 when promise rejects', (done) => {
+      mockCloudwatchListFails = true;
+      request(app).get('/validNamespace').then(() => {
+        expect(status).toHaveBeenCalledWith(500);
+        done();
+      });
+    });
   });
-
-
-  // valid namespaces
-  // on resolve, res.json with response.metrics
-  // on reject, 500s, res.json with error
 
 });
