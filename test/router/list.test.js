@@ -73,7 +73,7 @@ describe('list', () => {
         done();
       });
     });
-    test.only('responds with status 500 when promise rejects', (done) => {
+    test('responds with status 500 when promise rejects', (done) => {
       mockCloudwatchListFails = true;
       request(app).get('/validNamespace').then(() => {
         expect(status).toHaveBeenCalledWith(500);
