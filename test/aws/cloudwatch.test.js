@@ -1,6 +1,12 @@
 describe('cloudwatch', () => {
   const AWS = require('aws-sdk');
-  const listMetrics = jest.fn();
+  let listMetricsErrors = false;
+  const listMetrics = jest.fn().mockImplementation((opts, cb) => {
+    cb(
+      (listMetricsErrors) ? new Error('mockError') : undefined,
+      (listMetricsErrors) ? undefined : 'mockData'
+    );
+  });
   const cloudwatch = jest.spyOn(AWS, 'CloudWatch').mockImplementation(() => {
     const Mock = function(){};
     Mock.listMetrics = listMetrics;
@@ -26,9 +32,10 @@ describe('cloudwatch', () => {
     });
   });
 
-  describe.only('list()', () => {
+  describe('list()', () => {
+    let response;
     beforeAll(() => {
-      target.list('mockNamespace');
+      response = target.list('mockNamespace');
     });
     test('function exists', () => {
       expect(target.list).toBeDefined();
@@ -39,10 +46,22 @@ describe('cloudwatch', () => {
         Namespace: 'mockNamespace'
       }), expect.anything());
     });
+    test('returns a promise', () => {
+      expect(response).toBeInstanceOf(Promise);
+    });
+    test('promise resolves with data', (done) => {
+      response.then((data) => {
+        expect(data).toBe('mockData');
+        done();
+      });
+    });
+    test('promise rejects with error', (done) => {
+      listMetricsErrors = true;
+      target.list('something').catch((error) => {
+        expect(error).toBeInstanceOf(Error);
+        done();
+      });
+    });
   });
-
-  // TODO returns Promise
-  // resolves with data
-  // rejects with err
 
 });
