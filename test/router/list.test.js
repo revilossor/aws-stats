@@ -6,11 +6,17 @@ describe('list', () => {
   let app, target, json, status;
 
   const mockValidNamespaces = {
-    MockNamespace: 'mock_namespace'
+    MockNamespace: 'validNamespace'
   };
+
+  const mockCloudwatchList = jest.fn();
 
   beforeAll(() => {
     jest.mock('../../src/data/namespaces', () => (mockValidNamespaces));
+
+    jest.mock('../../src/aws/cloudwatch', () => ({
+      list: mockCloudwatchList
+    }));
 
     json = jest.spyOn(express.response, 'json');
     status = jest.spyOn(express.response, 'status');
@@ -36,16 +42,25 @@ describe('list', () => {
   });
 
   describe('invalid namespace', () => {
-    test('is 404', () => {
+    test('is 404', (done) => {
       request(app).get('/invalidNamespace').then(() => {
         expect(status).toHaveBeenCalledWith(404);
+        done();
+      });
+    });
+  });
+
+  describe('valid namespace', () => {
+    test('calls cloudwatch, with uppered namespace, prefixed with AWS/', (done) => {
+      request(app).get('/validNamespace').then(() => {
+        expect(mockCloudwatchList).toHaveBeenCalledWith('AWS/VALIDNAMESPACE');
+        done();
       });
     });
   });
 
 
   // valid namespaces
-  // calls cloudwatch.list, with namespace uppered
   // on resolve, res.json with response.metrics
   // on reject, 500s, res.json with error
 
