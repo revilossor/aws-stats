@@ -1,5 +1,6 @@
 const router = require('express').Router(),
   cloudwatch = require('../aws/cloudwatch'),
+  regions = require('../data/regions'),
   namespaces = require('../data/namespaces');
 
 /*
@@ -10,26 +11,27 @@ router.route('/').get((req, res) => {
 });
 
 /*
-  checks if arg is a valid namespace
+  checks if string arg is a value in data json
 */
-function isValidNamespace(str) {        // TODO some namespaces dont seem to be woking right - eg Route53
-  for(let namespace in namespaces) {
-    if(namespaces[namespace].toUpperCase() === str.toUpperCase()) { return true; }    // TODO lots of to upper here...
+function isValid(arg, data) {
+  if(!arg) { return false; }
+  for(let datum in data) {
+    if(data[datum].toUpperCase() === arg.toUpperCase()) { return true; }
   }
   return false;
 }
 
 /*
-  lists all available metrics for the given namespace
+  lists all available metrics for the given namespace, in the given region ( or default region - eu-west-2 )
 */
 router.route('/:namespace').get((req, res) => {
-  if(isValidNamespace(req.params.namespace)) {
-    cloudwatch.list(`AWS/${req.params.namespace.toUpperCase()}`)
-      .then(response => res.json(response.Metrics))
-      .catch(error => res.status(500).json(error));
-  } else {
-    res.status(404).send(`the namespace ${req.params.namespace} is invalid! ( see /list for valid namespaces! )`);
+  if(!isValid(req.params.namespace, namespaces)) {
+    return res.status(404).send(`the namespace ${req.params.namespace} is invalid! ( see /list for valid namespaces! )`);
   }
+  req.query.region = (isValid(req.query.region, regions)) ? req.query.region : 'eu-west-2';
+  cloudwatch.list(`AWS/${req.params.namespace.toUpperCase()}`, req.query.region)
+    .then(response => res.json(response.Metrics))
+    .catch(error => res.status(500).json(error));
 });
 
 module.exports = router;

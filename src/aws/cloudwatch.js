@@ -1,14 +1,12 @@
 const AWS = require('aws-sdk');
 
-const cloudwatch = new AWS.CloudWatch({
-  apiVersion: '2010-08-01',
-  region: 'eu-west-2'       // TODO this should be from a settings object.....
-});
-
 module.exports = {
-  list: (namespace) => {
+  list: (namespace, region) => {
     return new Promise((resolve, reject) => {
-      cloudwatch.listMetrics({
+      new AWS.CloudWatch({
+        apiVersion: '2010-08-01',
+        region: region
+      }).listMetrics({
         Namespace: namespace
       }, (err, data) => {
         (err) ? reject(err) : resolve(data);

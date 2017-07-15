@@ -19,32 +19,23 @@ describe('cloudwatch', () => {
     target = require('../../src/aws/cloudwatch');
   });
 
-  describe('init', () => {
-    test('uses correct API version', () => {
-      expect(cloudwatch).toHaveBeenCalledWith(expect.objectContaining({
-        apiVersion: '2010-08-01'
-      }));
-    });
-    test('uses correct region', () => {
-      expect(cloudwatch).toHaveBeenCalledWith(expect.objectContaining({
-        region: 'eu-west-2'
-      }));
-    });
-  });
-
   describe('list()', () => {
     let response;
     beforeAll(() => {
-      response = target.list('mockNamespace');
+      response = target.list('mockNamespace', 'mockRegion');
     });
     test('function exists', () => {
       expect(target.list).toBeDefined();
       expect(target.list).toBeInstanceOf(Function);
     });
+    test('uses correct API version', () => {
+      expect(cloudwatch).toHaveBeenCalledWith(expect.objectContaining({ apiVersion: '2010-08-01' }));
+    });
+    test('uses correct region', () => {
+      expect(cloudwatch).toHaveBeenCalledWith(expect.objectContaining({ region: 'mockRegion' }));
+    });
     test('calls listMetrics with passed namespace', () => {
-      expect(listMetrics).toHaveBeenCalledWith(expect.objectContaining({
-        Namespace: 'mockNamespace'
-      }), expect.anything());
+      expect(listMetrics).toHaveBeenCalledWith(expect.objectContaining({ Namespace: 'mockNamespace' }), expect.anything());
     });
     test('returns a promise', () => {
       expect(response).toBeInstanceOf(Promise);

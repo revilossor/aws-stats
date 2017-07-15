@@ -9,12 +9,17 @@ describe('list', () => {
     MockNamespace: 'validNamespace'
   };
 
+  const mockValidRegions = {
+    MockRegion: 'mockRegion'
+  };
+
   const mockMetrics = {
     Metrics: 'mockMetrics'
   };
 
   beforeAll(() => {
     jest.mock('../../src/data/namespaces', () => (mockValidNamespaces));
+    jest.mock('../../src/data/regions', () => (mockValidRegions));
 
     mockCloudwatchListFails = false;
     mockCloudwatchList = jest.fn().mockImplementation(() => {
@@ -39,7 +44,6 @@ describe('list', () => {
 
   afterEach(() => {
     status.mockClear();
-    json.mockClear();
   });
 
   describe('/ route', () => {
@@ -61,17 +65,18 @@ describe('list', () => {
   });
 
   describe('valid namespace', () => {
-    test('calls cloudwatch, with uppered namespace, prefixed with AWS/', (done) => {
-      request(app).get('/validNamespace').then(() => {
-        expect(mockCloudwatchList).toHaveBeenCalledWith('AWS/VALIDNAMESPACE');
-        done();
-      });
+    beforeAll((done) => {
+      request(app).get('/validNamespace').then(done);
     });
-    test('responds with Metrics when promise resolves', (done) => {
-      request(app).get('/validNamespace').then(() => {
-        expect(json).toHaveBeenCalledWith('mockMetrics');
-        done();
-      });
+
+    test('calls cloudwatch, with uppered namespace, prefixed with AWS/', () => {
+      expect(mockCloudwatchList).toHaveBeenCalledWith('AWS/VALIDNAMESPACE', expect.anything());
+    });
+    test('default region is eu-west-2', () => {
+      expect(mockCloudwatchList).toHaveBeenCalledWith(expect.anything(), 'eu-west-2');
+    });
+    test('responds with Metrics when promise resolves', () => {
+      expect(json).toHaveBeenCalledWith('mockMetrics');
     });
     test('responds with status 500 when promise rejects', (done) => {
       mockCloudwatchListFails = true;
@@ -80,6 +85,13 @@ describe('list', () => {
         done();
       });
     });
+    test('calls cloudwatch with region in querystring', (done) => {
+      request(app).get('/validNamespace?region=mockRegion').then(() => {
+        expect(mockCloudwatchList).toHaveBeenCalledWith(expect.anything(), 'mockRegion');
+        done();
+      });
+    });
+
   });
 
 });
