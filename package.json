@@ -8,7 +8,7 @@
     "prepush": "npm test",
     "lint": "npx eslint .",
     "test": "jest",
-    "dev": "npx nodemon app/main"
+    "start": "npx nodemon app/main"
   },
   "repository": {
     "type": "git",

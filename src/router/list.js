@@ -8,7 +8,10 @@ const router = require('express').Router(),
   lists all available namespaces
 */
 router.route('/').get((req, res) => {     // TODO this should be struct with namespaces / regions. also data endpoint for each?
-  res.json(namespaces);
+  res.json({
+    regions: regions,
+    namespaces: namespaces
+  });
 });
 
 /*

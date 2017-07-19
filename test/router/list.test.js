@@ -47,9 +47,12 @@ describe('list', () => {
   });
 
   describe('/ route', () => {
-    test('responds 200 with the namespace module as json', (done) => {
+    test('responds 200 with regions and namespaces', (done) => {
       request(app).get('/').then(() => {
-        expect(json).toHaveBeenCalledWith(expect.objectContaining(mockValidNamespaces));
+        expect(json).toHaveBeenCalledWith(expect.objectContaining({
+          regions: mockValidRegions,
+          namespaces:  mockValidNamespaces
+        }));
         done();
       });
     });
