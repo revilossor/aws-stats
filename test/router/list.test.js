@@ -5,17 +5,9 @@ describe('list', () => {
 
   let app, target, json, status, mockCloudwatchList, mockCloudwatchListFails;
 
-  const mockValidNamespaces = {
-    MockNamespace: 'validNamespace'
-  };
-
-  const mockValidRegions = {
-    MockRegion: 'mockRegion'
-  };
-
-  const mockMetrics = {
-    Metrics: 'mockMetrics'
-  };
+  const mockValidNamespaces = { MockNamespace: 'validNamespace' },
+    mockValidRegions = { MockRegion: 'mockRegion' },
+    mockMetrics = { Metrics: 'mockMetrics' };
 
   beforeAll(() => {
     jest.mock('../../src/data/namespaces', () => (mockValidNamespaces));
@@ -54,7 +46,7 @@ describe('list', () => {
           namespaces:  mockValidNamespaces
         }));
         done();
-      });
+      }).catch(done);
     });
   });
 
@@ -63,7 +55,7 @@ describe('list', () => {
       request(app).get('/invalidNamespace').then(() => {
         expect(status).toHaveBeenCalledWith(404);
         done();
-      });
+      }).catch(done);
     });
   });
 
@@ -86,13 +78,13 @@ describe('list', () => {
       request(app).get('/validNamespace').then(() => {
         expect(status).toHaveBeenCalledWith(500);
         done();
-      });
+      }).catch(done);
     });
     test('calls cloudwatch with region in querystring', (done) => {
       request(app).get('/validNamespace?region=mockRegion').then(() => {
         expect(mockCloudwatchList).toHaveBeenCalledWith(expect.anything(), 'mockRegion');
         done();
-      });
+      }).catch(done);
     });
 
   });

@@ -12,5 +12,11 @@ module.exports = {
         (err) ? reject(err) : resolve(data);
       });
     });
+  },
+  get: (options) => {
+    return new Promise((resolve, reject) => {
+      resolve({not: 'implemented' + options});
+      if(Math.random() == 0) { reject(); }
+    });
   }
 };
