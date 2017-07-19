@@ -2,7 +2,8 @@ describe('index', () => {
   const express = require('express');
   let use, target;
   const routerAssertions = [
-    { endpoint: '/list', mock: jest.fn(), path: '../src/router/list' }
+    { endpoint: '/list', mock: jest.fn(), path: '../src/router/list' },
+    { endpoint: '/stat', mock: jest.fn(), path: '../src/router/stat' }
   ];
 
   beforeAll(() => {

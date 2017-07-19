@@ -5,9 +5,9 @@ const router = require('express').Router(),
   isValue = require('../util/isValue');
 
 /*
-  lists all available namespaces
+  lists all available regions and namespaces
 */
-router.route('/').get((req, res) => {     // TODO this should be struct with namespaces / regions. also data endpoint for each?
+router.route('/').get((req, res) => {
   res.json({
     regions: regions,
     namespaces: namespaces

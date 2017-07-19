@@ -1,7 +1,7 @@
 /*
   checks if arg is a value in data json
 */
-module.exports = (arg, data, caseSensitive = true) => {
+module.exports = (arg, data, caseSensitive = false) => {
   if(!arg || !data) { return false; }
   if(typeof arg === 'string' && !caseSensitive) { arg = arg.toUpperCase(); }
   let datum;
