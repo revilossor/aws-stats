@@ -21,6 +21,7 @@ router.route('/:namespace/:metric').get((req, res) => {
     }
   }
   // TODO do stuff with regex....
+  // TODO have to set dimensions depending on namespace, and regex
   const options = {
     namespace: req.params.namespace,
     metric: req.params.metric,

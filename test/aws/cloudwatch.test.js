@@ -13,14 +13,13 @@ describe('cloudwatch', () => {
     return Mock;
   });
 
-  let target;
+  let target, response;
 
   beforeAll(() => {
     target = require('../../src/aws/cloudwatch');
   });
 
   describe('list()', () => {
-    let response;
     beforeAll(() => {
       response = target.list('mockNamespace', 'mockRegion');
     });
@@ -52,6 +51,16 @@ describe('cloudwatch', () => {
         expect(error).toBeInstanceOf(Error);
         done();
       });
+    });
+  });
+
+  describe('get()', () => {
+    beforeAll(() => {
+      response = target.get({});
+    });
+    test('function exists', () => {
+      expect(target.get).toBeDefined();
+      expect(target.list).toBeInstanceOf(Function);
     });
   });
 
