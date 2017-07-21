@@ -118,7 +118,7 @@ describe('describe', () => {
           });
         });
         test('promise resolves if describe function ok', () => {
-          mockDescribeFails[assertion.namespace] = true;
+          mockDescribeFails[assertion.namespace] = false;
           mockCache[assertion.namespace] = null;
           target[assertion.namespace]('mockRegion').then((response) => {  // meh, just stringify cos array of deep compare...
             expect(JSON.stringify(response)).toBe(JSON.stringify(assertion.resolve));

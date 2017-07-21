@@ -81,6 +81,7 @@ describe('list', () => {
       }).catch(done);
     });
     test('calls cloudwatch with region in querystring', (done) => {
+      mockCloudwatchListFails = false;
       request(app).get('/validNamespace?region=mockRegion').then(() => {
         expect(mockCloudwatchList).toHaveBeenCalledWith(expect.anything(), 'mockRegion');
         done();
