@@ -20,6 +20,7 @@ router.route('/:namespace/:metric').get((req, res) => {
       return res.status(403).send(`the region "${req.query.region}" is invalid`);
     }
   }
+
   // TODO some namespaces (eg ec2 will need to describe instances first)
   // TODO do stuff with regex....
   // TODO have to set dimensions depending on namespace, and regex

@@ -69,6 +69,8 @@ describe('describe', () => {
     target = require('../../src/aws/describe');
   });
 
+  // TODO test theres a describe function for each namespace
+
   assertions.forEach((assertion) => {
     describe(assertion.namespace, () => {
       beforeAll(() => {
@@ -110,18 +112,20 @@ describe('describe', () => {
         test('is a Promise', () => {
           expect(target[assertion.namespace]('mockRegion')).toBeInstanceOf(Promise);
         });
-        test('promise rejects if describe function error', () => {
+        test('promise rejects if describe function error', (done) => {
           mockDescribeFails[assertion.namespace] = true;
           mockCache[assertion.namespace] = null;
           target[assertion.namespace]('mockRegion').catch((err) => {
             expect(err).toBeInstanceOf(Error);
+            done();
           });
         });
-        test('promise resolves if describe function ok', () => {
+        test('promise resolves if describe function ok', (done) => {
           mockDescribeFails[assertion.namespace] = false;
           mockCache[assertion.namespace] = null;
           target[assertion.namespace]('mockRegion').then((response) => {  // meh, just stringify cos array of deep compare...
             expect(JSON.stringify(response)).toBe(JSON.stringify(assertion.resolve));
+            done();
           });
         });
 
