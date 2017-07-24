@@ -30,14 +30,14 @@ describe('getMatching', () => {
       expect(target[namespace]).toBeDefined();
       expect(target[namespace]).toBeInstanceOf(Function);
     });
-    describe('return', () => {
+    describe(`"${namespace}" return`, () => {
       beforeAll((done) => {
         promise = target[namespace]('MockMatching', 'MockRegion').then((res) => {
           result = res;
           done();
         });
       });
-      test('returns a promise', () => {
+      test('is a promise', () => {
         expect(promise).toBeInstanceOf(Promise);
       });
       test('resolves with regex matches', () => {
