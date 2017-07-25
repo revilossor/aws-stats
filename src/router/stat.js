@@ -19,6 +19,7 @@ router.route('/:namespace/:metric').get((req, res) => {
       return res.status(403).send(`the region "${req.query.region}" is invalid`);
     }
   }
+  req.params.namespace = req.params.namespace.toUpperCase();
   getDimensions(req.params.namespace, region, req.query.regex || null).then((dimensions) => {
     const options = {
       namespace: req.params.namespace,

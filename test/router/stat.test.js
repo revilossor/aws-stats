@@ -61,7 +61,7 @@ describe('stat', () => {
       mockCloudwatchGet.mockClear();
       request(app).get('/validNamespace/mockMetric?region=mockRegion&age=99999&regex=poop').then(done).catch(done);
     });
-    test('namespace', () => { expect(mockCloudwatchGet).toHaveBeenCalledWith(expect.objectContaining({ namespace: 'validNamespace' })); });
+    test('namespace', () => { expect(mockCloudwatchGet).toHaveBeenCalledWith(expect.objectContaining({ namespace: 'validNamespace'.toUpperCase() })); });
     test('metric', () => { expect(mockCloudwatchGet).toHaveBeenCalledWith(expect.objectContaining({ metric: 'mockMetric' })); });
     test('region', () => { expect(mockCloudwatchGet).toHaveBeenCalledWith(expect.objectContaining({ region: 'mockRegion' })); });
     test('start', () => {

@@ -13,6 +13,6 @@ function describeAndFilter(namespace, region, regex, propToMatch) {
 }
 /* istanbul ignore next */ // - istanbul doesnt recognise the ec2 tests for some reason...
 module.exports = {
-  EC2: (regex, region) => describeAndFilter('EC2', region, regex, 'InstanceName'),
-  ELB: (regex, region) => describeAndFilter('ELB', region, regex, 'LoadBalancerName')
+  EC2: (region, regex) => describeAndFilter('EC2', region, regex, 'InstanceName'),
+  ELB: (region, regex) => describeAndFilter('ELB', region, regex, 'LoadBalancerName')
 };

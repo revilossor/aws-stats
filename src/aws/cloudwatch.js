@@ -14,6 +14,8 @@ module.exports = {
     });
   },
   get: (options) => {
+    console.log('cloudwatch::get');
+    console.dir(options);
     return new Promise((resolve, reject) => {
       resolve({not: 'implemented' + options});
       if(Math.random() == 0) { reject(); }

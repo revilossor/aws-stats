@@ -32,7 +32,7 @@ describe('getMatching', () => {
     });
     describe(`"${namespace}" return`, () => {
       beforeAll((done) => {
-        promise = target[namespace]('MockMatching', 'MockRegion').then((res) => {
+        promise = target[namespace]('MockRegion', 'MockMatching').then((res) => {
           result = res;
           done();
         });
