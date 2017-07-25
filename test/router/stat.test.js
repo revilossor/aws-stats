@@ -7,13 +7,20 @@ describe('stat', () => {
     mockValidRegions = { MockRegion: 'mockRegion' },
     mockStatResponse = { not: 'implemented' };    // TODO this should be the struct from aws...
 
-  let app, target, status, json, mockCloudwatchGet, mockCloudwatchGetFails;
+  let app, target, status, json, mockCloudwatchGet, mockCloudwatchGetFails, mockGetDimensionsFails;
 
   const dateTolerance = 100;
 
   beforeAll(() => {
     jest.mock('../../src/data/namespaces', () => (mockValidNamespaces));
     jest.mock('../../src/data/regions', () => (mockValidRegions));
+
+    mockGetDimensionsFails = false;
+    jest.mock('../../src/util/getDimensions', () => {
+      return () => new Promise((resolve, reject) => {
+        (mockGetDimensionsFails) ? reject(new Error('mockError')) : resolve(['mockDimensions']);
+      });
+    });
 
     mockCloudwatchGetFails = false;
     mockCloudwatchGet = jest.fn().mockImplementation(() => {
@@ -63,7 +70,7 @@ describe('stat', () => {
       const isWithinTolerance = (expected - actual > -(dateTolerance / 2)) && (expected - actual < (dateTolerance / 2));
       expect(isWithinTolerance).toBe(true);
     });
-    test('regex', () => { expect(mockCloudwatchGet).toHaveBeenCalledWith(expect.objectContaining({ regex: 'poop' })); });
+    test('dimensions', () => { expect(mockCloudwatchGet).toHaveBeenCalledWith(expect.objectContaining({ dimensions: ['mockDimensions'] })); });
   });
 
   describe('default params', () => {
@@ -77,25 +84,36 @@ describe('stat', () => {
       const isWithinTolerance = (expected - actual > -(dateTolerance / 2)) && (expected - actual < (dateTolerance / 2));
       expect(isWithinTolerance).toBe(true);
     });
-    test('regex is null', () => { expect(mockCloudwatchGet).toHaveBeenCalledWith(expect.objectContaining({ regex: null })); });
     test('region is eu-west-2', () => { expect(mockCloudwatchGet).toHaveBeenCalledWith(expect.objectContaining({ region: 'eu-west-2' })); });
   });
 
   describe('response', () => {
-    beforeAll((done) => {
+    beforeEach(() => {
       json.mockClear();
-      request(app).get('/validNamespace/mockMetric').then(done);
+      status.mockClear();
     });
-    test('responds with Metrics when promise resolves', () => {
-      expect(json).toHaveBeenCalledWith(mockStatResponse);
+    test('responds with Metrics when cloudwatch promise resolves', (done) => {
+      request(app).get('/validNamespace/mockMetric').then(() => {
+        expect(json).toHaveBeenCalledWith(mockStatResponse);
+        done();
+      });
     });
-    test('responds with status 500 when promise rejects', (done) => {
+    test('responds with status 500 when cloudwatch promise rejects', (done) => {
       mockCloudwatchGetFails = true;
       request(app).get('/validNamespace/mockMetric').then(() => {
         expect(status).toHaveBeenCalledWith(500);
         done();
-      }).catch(done);
+      });
     });
+    test('responds with status 500 when getDimensions promise rejects', (done) => {
+      mockCloudwatchGetFails = false;
+      mockGetDimensionsFails = true;
+      request(app).get('/validNamespace/mockMetric').then(() => {
+        expect(status).toHaveBeenCalledWith(500);
+        done();
+      });
+    });
+
   });
 
 });
