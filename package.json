@@ -1,6 +1,6 @@
 {
   "name": "aws-stats",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "an express router that exposes an api to get cloudmetrics stats from aws",
   "main": "main.js",
   "scripts": {
