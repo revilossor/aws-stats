@@ -22,7 +22,7 @@ router.route('/:namespace/:metric').get((req, res) => {
   req.params.namespace = req.params.namespace.toUpperCase();
   getDimensions(req.params.namespace, region, req.query.regex || null).then((dimensions) => {
     const options = {
-      namespace: req.params.namespace,
+      namespace: `AWS/${req.params.namespace}`,
       metric: req.params.metric,
       start: new Date(Date.now() - ((req.query.age) ? parseInt(req.query.age) : 3600000)),
       dimensions: dimensions,

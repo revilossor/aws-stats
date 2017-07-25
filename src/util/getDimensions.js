@@ -6,7 +6,7 @@
 const getMatching = require('./getMatching');
 
 const namespaceMap = {
-  EC2:  {  name: 'InstanceId',        value: 'InstanceName'     },
+  EC2:  {  name: 'InstanceId',        value: 'InstanceId'     },
   ELB:  {  name: 'LoadBalancerName',  value: 'LoadBalancerName' }
 };
 

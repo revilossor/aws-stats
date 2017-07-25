@@ -1,15 +1,23 @@
 describe('cloudwatch', () => {
   const AWS = require('aws-sdk');
   let listMetricsErrors = false;
+  let getMetricsErrors = false;
   const listMetrics = jest.fn().mockImplementation((opts, cb) => {
     cb(
       (listMetricsErrors) ? new Error('mockError') : undefined,
       (listMetricsErrors) ? undefined : 'mockData'
     );
   });
+  const getMetricStatistics = jest.fn().mockImplementation((opts, cb) => {
+    cb(
+      (getMetricsErrors) ? new Error('mockError') : undefined,
+      (getMetricsErrors) ? undefined : 'mockData'
+    );
+  });
   const cloudwatch = jest.spyOn(AWS, 'CloudWatch').mockImplementation(() => {
     const Mock = function(){};
     Mock.listMetrics = listMetrics;
+    Mock.getMetricStatistics = getMetricStatistics;
     return Mock;
   });
 
@@ -56,12 +64,60 @@ describe('cloudwatch', () => {
 
   describe('get()', () => {
     beforeAll(() => {
-      response = target.get({});
+      cloudwatch.mockClear();
+      response = target.get({
+        namespace: 'mockNamespace',
+        metric: 'mockMetric',
+        start: 'mockStart',
+        dimensions: ['mockDimension'],
+        region: 'mockRegion'
+      });
     });
     test('function exists', () => {
       expect(target.get).toBeDefined();
-      expect(target.list).toBeInstanceOf(Function);
+      expect(target.get).toBeInstanceOf(Function);
     });
+    test('uses correct API version', () => {
+      expect(cloudwatch).toHaveBeenCalledWith(expect.objectContaining({ apiVersion: '2010-08-01' }));
+    });
+    test('uses correct region', () => {
+      expect(cloudwatch).toHaveBeenCalledWith(expect.objectContaining({ region: 'mockRegion' }));
+    });
+    describe('uses correct options', () => {    // meh, ignore EndTime
+      test('StartTime',   () => { expect(getMetricStatistics).toHaveBeenCalledWith(expect.objectContaining({ StartTime: 'mockStart' }), expect.anything()); });
+      test('MetricName',  () => { expect(getMetricStatistics).toHaveBeenCalledWith(expect.objectContaining({ MetricName: 'mockMetric' }), expect.anything()); });
+      test('Namespace',   () => { expect(getMetricStatistics).toHaveBeenCalledWith(expect.objectContaining({ Namespace: 'mockNamespace' }), expect.anything()); });
+      test('Period',      () => { expect(getMetricStatistics).toHaveBeenCalledWith(expect.objectContaining({ Period: 300 }), expect.anything()); });
+      test('Statistics',  () => { expect(getMetricStatistics).toHaveBeenCalledWith(expect.objectContaining({ Statistics: ['Average'] }), expect.anything()); });
+      test('Dimensions',  () => { expect(getMetricStatistics).toHaveBeenCalledWith(expect.objectContaining({ Dimensions: ['mockDimension'] }), expect.anything()); });
+    });
+    describe('return', () => {
+      test('is a promise', () => {
+        expect(response).toBeInstanceOf(Promise);
+      });
+      test('resolves with data', (done) => {
+        response.then((data) => {
+          expect(data).toBe('mockData');
+          done();
+        });
+      });
+      test('rejects with error', (done) => {
+        getMetricsErrors = true;
+        target.get({
+          namespace: 'mockNamespace',
+          metric: 'mockMetric',
+          start: 'mockStart',
+          dimensions: ['mockDimension'],
+          region: 'mockRegion'
+        }).catch((err) => {
+          expect(err).toBeInstanceOf(Error);
+          done();
+        });
+      });
+
+    });
+
+
   });
 
 });

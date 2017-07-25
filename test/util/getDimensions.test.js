@@ -17,7 +17,7 @@ describe('getDimensions', () => {
   jest.mock('../../src/util/getMatching', () => mockGetMatching);
 
   const assertions = [
-    { namespace: 'EC2', matches: { InstanceName: 'mockValue'}, dimension: 'InstanceId' },
+    { namespace: 'EC2', matches: { InstanceId: 'mockValue'}, dimension: 'InstanceId' },
     { namespace: 'ELB', matches: { LoadBalancerName: 'mockValue'}, dimension: 'LoadBalancerName' }
   ];
 
