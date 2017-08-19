@@ -26,12 +26,14 @@ router.route('/:namespace/:metric').get((req, res) => {
       metric: req.params.metric,
       start: new Date(Date.now() - ((req.query.age) ? parseInt(req.query.age) : 3600000)),
       dimensions: dimensions,
-      region: region
+      region: region,
+      regex: req.query.regex || null
     };
-    // TODO get stats from cloudwatch module then return json. mutate somehow?
     cloudwatch.get(options)
-      .then(response => res.json(response))
-      .catch(error => res.status(500).json(error));
+      .then(response => res.json({
+        options: options,
+        response: response
+      })).catch(error => res.status(500).json(error));
   }).catch(error => res.status(500).json(error));
 });
 
