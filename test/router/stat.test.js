@@ -94,7 +94,22 @@ describe('stat', () => {
     });
     test('responds with Metrics when cloudwatch promise resolves', (done) => {
       request(app).get('/validNamespace/mockMetric').then(() => {
-        expect(json).toHaveBeenCalledWith(mockStatResponse);
+        expect(json).toHaveBeenCalledWith(expect.objectContaining({ response: mockStatResponse }));
+        done();
+      });
+    });
+    test('responds with Options when cloudatch promise resolves', (done) => {
+      request(app).get('/validNamespace/mockMetric?region=mockRegion&age=99999&regex=poop').then(() => {
+        expect(json).toHaveBeenCalledWith(expect.objectContaining({
+          options: {
+            dimensions: ['mockDimensions'],
+            metric: 'mockMetric',
+            namespace: 'AWS/VALIDNAMESPACE',
+            regex: 'poop',
+            region: 'mockRegion',
+            start: expect.anything()
+          }
+        }));
         done();
       });
     });
