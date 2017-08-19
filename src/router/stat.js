@@ -1,24 +1,36 @@
 const router = require('express').Router(),
   regions = require('../data/regions'),
   namespaces = require('../data/namespaces'),
+  statistics = require('../data/statistics'),
   isValue = require('../util/isValue'),
   getDimensions = require('../util/getDimensions'),
   cloudwatch = require('../aws/cloudwatch');
 
 router.route('/:namespace').get((req, res) => {
-  res.status(403).send('no metric!');
+  res.status(404).send('no metric!');
 });
 
 router.route('/:namespace/:metric').get((req, res) => {
   if(!isValue(req.params.namespace, namespaces)) { return res.status(404).send(`the namespace "${req.params.namespace}" is invalid!`); }
-  let region = 'eu-west-2';
+
+  let region = 'eu-west-2';   // TODO bit of repetition here... refactor to function?
   if(req.query.region) {
     if(isValue(req.query.region, regions)) {
       region = req.query.region;
     } else {
-      return res.status(403).send(`the region "${req.query.region}" is invalid`);
+      return res.status(404).send(`the region "${req.query.region}" is invalid`);
     }
   }
+
+  let stat = 'Average';
+  if(req.query.stat) {
+    if(isValue(req.query.stat, statistics)) {
+      stat = req.query.stat;
+    } else {
+      return res.status(404).send(`the stat "${req.query.stat}" is invalid`);
+    }
+  }
+
   req.params.namespace = req.params.namespace.toUpperCase();
   getDimensions(req.params.namespace, region, req.query.regex || null).then((dimensions) => {
     const options = {
@@ -27,6 +39,7 @@ router.route('/:namespace/:metric').get((req, res) => {
       start: new Date(Date.now() - ((req.query.age) ? parseInt(req.query.age) : 3600000)),
       dimensions: dimensions,
       region: region,
+      stat: stat,
       regex: req.query.regex || null
     };
     cloudwatch.get(options)
