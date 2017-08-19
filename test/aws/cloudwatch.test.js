@@ -70,7 +70,8 @@ describe('cloudwatch', () => {
         metric: 'mockMetric',
         start: 'mockStart',
         dimensions: ['mockDimension'],
-        region: 'mockRegion'
+        region: 'mockRegion',
+        statistics: ['mockStatistics']
       });
     });
     test('function exists', () => {
@@ -83,12 +84,12 @@ describe('cloudwatch', () => {
     test('uses correct region', () => {
       expect(cloudwatch).toHaveBeenCalledWith(expect.objectContaining({ region: 'mockRegion' }));
     });
-    describe('uses correct options', () => {    // meh, ignore EndTime
+    describe('uses correct options', () => {
       test('StartTime',   () => { expect(getMetricStatistics).toHaveBeenCalledWith(expect.objectContaining({ StartTime: 'mockStart' }), expect.anything()); });
       test('MetricName',  () => { expect(getMetricStatistics).toHaveBeenCalledWith(expect.objectContaining({ MetricName: 'mockMetric' }), expect.anything()); });
       test('Namespace',   () => { expect(getMetricStatistics).toHaveBeenCalledWith(expect.objectContaining({ Namespace: 'mockNamespace' }), expect.anything()); });
       test('Period',      () => { expect(getMetricStatistics).toHaveBeenCalledWith(expect.objectContaining({ Period: 300 }), expect.anything()); });
-      test('Statistics',  () => { expect(getMetricStatistics).toHaveBeenCalledWith(expect.objectContaining({ Statistics: ['Average'] }), expect.anything()); });
+      test('Statistics',  () => { expect(getMetricStatistics).toHaveBeenCalledWith(expect.objectContaining({ Statistics: ['mockStatistics'] }), expect.anything()); });
       test('Dimensions',  () => { expect(getMetricStatistics).toHaveBeenCalledWith(expect.objectContaining({ Dimensions: ['mockDimension'] }), expect.anything()); });
     });
     describe('return', () => {

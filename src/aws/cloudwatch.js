@@ -25,7 +25,7 @@ module.exports = {
         MetricName: options.metric,
         Namespace: options.namespace,
         Period: 300,
-        Statistics: ['Average'],
+        Statistics: options.statistics,
         Dimensions: options.dimensions
       }, (err, data) => {
         (err) ? reject(err) : resolve(data);
