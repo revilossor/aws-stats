@@ -5,13 +5,16 @@ describe('list', () => {
 
   let app, target, json, status, mockCloudwatchList, mockCloudwatchListFails;
 
-  const mockValidNamespaces = { MockNamespace: 'validNamespace' },
-    mockValidRegions = { MockRegion: 'mockRegion' },
-    mockMetrics = { Metrics: 'mockMetrics' };
+  const mockMetrics = { Metrics: 'mockMetrics' };
+
+  const assertions = [
+    { key: 'regions', value: { MockRegion: 'mockRegion' }, path: '../../src/data/regions' },
+    { key: 'namespaces', value: { MockNamespace: 'validNamespace' }, path: '../../src/data/namespaces' },
+    { key: 'statistics', value: ['MockValidStatistics'], path: '../../src/data/statistics' }
+  ];
 
   beforeAll(() => {
-    jest.mock('../../src/data/namespaces', () => (mockValidNamespaces));
-    jest.mock('../../src/data/regions', () => (mockValidRegions));
+    assertions.forEach(assertion => jest.mock(assertion.path, () => (assertion.value)));
 
     mockCloudwatchListFails = false;
     mockCloudwatchList = jest.fn().mockImplementation(() => {
@@ -39,14 +42,16 @@ describe('list', () => {
   });
 
   describe('/ route', () => {
-    test('responds 200 with regions and namespaces', (done) => {
-      request(app).get('/').then(() => {
-        expect(json).toHaveBeenCalledWith(expect.objectContaining({
-          regions: mockValidRegions,
-          namespaces:  mockValidNamespaces
-        }));
-        done();
-      }).catch(done);
+    beforeAll((done) => {
+      request(app).get('/').then(done).catch(done);
+    });
+
+    assertions.forEach((assertion) => {
+      test(`lists ${assertion.key}`, () => {
+        const expectation = {};
+        expectation[`${assertion.key}`] = assertion.value;
+        expect(json).toHaveBeenCalledWith(expect.objectContaining(expectation));
+      });
     });
   });
 
