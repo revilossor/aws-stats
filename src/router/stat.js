@@ -39,7 +39,7 @@ router.route('/:namespace/:metric').get((req, res) => {
       start: new Date(Date.now() - ((req.query.age) ? parseInt(req.query.age) : 3600000)),
       dimensions: dimensions,
       region: region,
-      stat: stat,
+      stat: [stat],
       regex: req.query.regex || null
     };
     cloudwatch.get(options)
