@@ -71,7 +71,7 @@ describe('cloudwatch', () => {
         start: 'mockStart',
         dimensions: ['mockDimension'],
         region: 'mockRegion',
-        statistics: ['mockStatistics']
+        stat: ['mockStatistics']
       });
     });
     test('function exists', () => {

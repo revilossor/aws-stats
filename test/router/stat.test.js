@@ -68,7 +68,7 @@ describe('stat', () => {
     test('namespace', () => { expect(mockCloudwatchGet).toHaveBeenCalledWith(expect.objectContaining({ namespace: 'aws/validNamespace'.toUpperCase() })); });
     test('metric', () => { expect(mockCloudwatchGet).toHaveBeenCalledWith(expect.objectContaining({ metric: 'mockMetric' })); });
     test('region', () => { expect(mockCloudwatchGet).toHaveBeenCalledWith(expect.objectContaining({ region: 'mockRegion' })); });
-    test('stat', () => { expect(mockCloudwatchGet).toHaveBeenCalledWith(expect.objectContaining({ stat: 'mockStat' })); });
+    test('stat', () => { expect(mockCloudwatchGet).toHaveBeenCalledWith(expect.objectContaining({ stat: ['mockStat'] })); });
     test('start', () => {
       const expected = new Date(Date.now() - 99999),
         actual = new Date(mockCloudwatchGet.mock.calls[0][0].start);
@@ -90,7 +90,7 @@ describe('stat', () => {
       expect(isWithinTolerance).toBe(true);
     });
     test('region is eu-west-2', () => { expect(mockCloudwatchGet).toHaveBeenCalledWith(expect.objectContaining({ region: 'eu-west-2' })); });
-    test('stat is Average', () => { expect(mockCloudwatchGet).toHaveBeenCalledWith(expect.objectContaining({ stat: 'Average' })); });
+    test('stat is Average', () => { expect(mockCloudwatchGet).toHaveBeenCalledWith(expect.objectContaining({ stat: ['Average'] })); });
   });
 
   describe('response', () => {
@@ -104,7 +104,7 @@ describe('stat', () => {
         done();
       });
     });
-    test('responds with Options when cloudwatch promise resolves', (done) => {
+    test.only('responds with Options when cloudwatch promise resolves', (done) => {
       request(app).get('/validNamespace/mockMetric?region=mockRegion&age=99999&regex=poop&stat=mockStat').then(() => {
         expect(json).toHaveBeenCalledWith(expect.objectContaining({
           options: {
@@ -113,7 +113,7 @@ describe('stat', () => {
             namespace: 'AWS/VALIDNAMESPACE',
             regex: 'poop',
             region: 'mockRegion',
-            stat: 'mockStat',
+            stat: ['mockStat'],
             start: expect.anything()
           }
         }));
