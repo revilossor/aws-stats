@@ -71,6 +71,7 @@ describe('cloudwatch', () => {
         start: 'mockStart',
         dimensions: ['mockDimension'],
         region: 'mockRegion',
+        period: 'mockPeriod',
         stat: ['mockStatistics']
       });
     });
@@ -88,7 +89,7 @@ describe('cloudwatch', () => {
       test('StartTime',   () => { expect(getMetricStatistics).toHaveBeenCalledWith(expect.objectContaining({ StartTime: 'mockStart' }), expect.anything()); });
       test('MetricName',  () => { expect(getMetricStatistics).toHaveBeenCalledWith(expect.objectContaining({ MetricName: 'mockMetric' }), expect.anything()); });
       test('Namespace',   () => { expect(getMetricStatistics).toHaveBeenCalledWith(expect.objectContaining({ Namespace: 'mockNamespace' }), expect.anything()); });
-      test('Period',      () => { expect(getMetricStatistics).toHaveBeenCalledWith(expect.objectContaining({ Period: 300 }), expect.anything()); });
+      test('Period',      () => { expect(getMetricStatistics).toHaveBeenCalledWith(expect.objectContaining({ Period: 'mockPeriod' }), expect.anything()); });
       test('Statistics',  () => { expect(getMetricStatistics).toHaveBeenCalledWith(expect.objectContaining({ Statistics: ['mockStatistics'] }), expect.anything()); });
       test('Dimensions',  () => { expect(getMetricStatistics).toHaveBeenCalledWith(expect.objectContaining({ Dimensions: ['mockDimension'] }), expect.anything()); });
     });

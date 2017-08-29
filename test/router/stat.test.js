@@ -6,7 +6,7 @@ describe('stat', () => {
   const mockValidNamespaces = { MockNamespace: 'validNamespace' },
     mockValidRegions = { MockRegion: 'mockRegion' },
     mockValidStats = { MockStat: 'mockStat' },
-    mockValidPeriods = { MockPeriod: 'mockPeriod' },
+    mockValidPeriods = { MockPeriod: 999 },
     mockStatResponse = { not: 'implemented' };    // TODO this should be the struct from aws...
 
   let app, target, status, json, mockCloudwatchGet, mockCloudwatchGetFails, mockGetDimensionsFails;
@@ -66,13 +66,13 @@ describe('stat', () => {
   describe('calls cloudwatch.get with correct params', () => {
     beforeAll((done) => {
       mockCloudwatchGet.mockClear();
-      request(app).get('/validNamespace/mockMetric?region=mockRegion&age=99999&regex=poop&stat=mockStat').then(done).catch(done);
+      request(app).get('/validNamespace/mockMetric?region=mockRegion&age=99999&regex=poop&stat=mockStat&period=999').then(done).catch(done);
     });
     test('namespace', () => { expect(mockCloudwatchGet).toHaveBeenCalledWith(expect.objectContaining({ namespace: 'aws/validNamespace'.toUpperCase() })); });
     test('metric', () => { expect(mockCloudwatchGet).toHaveBeenCalledWith(expect.objectContaining({ metric: 'mockMetric' })); });
     test('region', () => { expect(mockCloudwatchGet).toHaveBeenCalledWith(expect.objectContaining({ region: 'mockRegion' })); });
     test('stat', () => { expect(mockCloudwatchGet).toHaveBeenCalledWith(expect.objectContaining({ stat: ['mockStat'] })); });
-    test('period', () => { expect(mockCloudwatchGet).toHaveBeenCalledWith(expect.objectContaining({ period: 300 })); });
+    test('period', () => { expect(mockCloudwatchGet).toHaveBeenCalledWith(expect.objectContaining({ period: 999 })); });
     test('start', () => {
       const expected = new Date(Date.now() - 99999),
         actual = new Date(mockCloudwatchGet.mock.calls[0][0].start);

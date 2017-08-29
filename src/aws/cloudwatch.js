@@ -24,7 +24,7 @@ module.exports = {
         EndTime: new Date(),
         MetricName: options.metric,
         Namespace: options.namespace,
-        Period: 300,
+        Period: options.period,
         Statistics: options.stat,
         Dimensions: options.dimensions
       }, (err, data) => {
