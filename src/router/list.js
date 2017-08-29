@@ -2,7 +2,6 @@ const router = require('express').Router(),
   cloudwatch = require('../aws/cloudwatch'),
   regions = require('../data/regions'),
   namespaces = require('../data/namespaces'),
-  statistics = require('../data/statistics'),
   isValue = require('../util/isValue');
 
 /*
@@ -12,7 +11,8 @@ router.route('/').get((req, res) => {
   res.json({
     regions: regions,
     namespaces: namespaces,
-    statistics: statistics
+    statistics: require('../data/statistics'),
+    periods: require('../data/periods')
   });
 });
 

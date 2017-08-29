@@ -10,7 +10,8 @@ describe('list', () => {
   const assertions = [
     { key: 'regions', value: { MockRegion: 'mockRegion' }, path: '../../src/data/regions' },
     { key: 'namespaces', value: { MockNamespace: 'validNamespace' }, path: '../../src/data/namespaces' },
-    { key: 'statistics', value: ['MockValidStatistics'], path: '../../src/data/statistics' }
+    { key: 'statistics', value: ['MockValidStatistics'], path: '../../src/data/statistics' },
+    { key: 'periods', value: { MockPeriod: 'mockPeriod' }, path: '../../src/data/periods' }
   ];
 
   beforeAll(() => {
