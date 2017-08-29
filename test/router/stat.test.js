@@ -104,7 +104,7 @@ describe('stat', () => {
         done();
       });
     });
-    test.only('responds with Options when cloudwatch promise resolves', (done) => {
+    test('responds with Options when cloudwatch promise resolves', (done) => {
       request(app).get('/validNamespace/mockMetric?region=mockRegion&age=99999&regex=poop&stat=mockStat').then(() => {
         expect(json).toHaveBeenCalledWith(expect.objectContaining({
           options: {
