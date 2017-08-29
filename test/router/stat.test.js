@@ -6,6 +6,7 @@ describe('stat', () => {
   const mockValidNamespaces = { MockNamespace: 'validNamespace' },
     mockValidRegions = { MockRegion: 'mockRegion' },
     mockValidStats = { MockStat: 'mockStat' },
+    mockValidPeriods = { MockPeriod: 'mockPeriod' },
     mockStatResponse = { not: 'implemented' };    // TODO this should be the struct from aws...
 
   let app, target, status, json, mockCloudwatchGet, mockCloudwatchGetFails, mockGetDimensionsFails;
@@ -16,6 +17,7 @@ describe('stat', () => {
     jest.mock('../../src/data/namespaces', () => (mockValidNamespaces));
     jest.mock('../../src/data/regions', () => (mockValidRegions));
     jest.mock('../../src/data/statistics', () => (mockValidStats));
+    jest.mock('../../src/data/periods', () => (mockValidPeriods));
 
     mockGetDimensionsFails = false;
     jest.mock('../../src/util/getDimensions', () => {
@@ -47,7 +49,8 @@ describe('stat', () => {
       { uri: '/invalidNamespace/validMetric',               condition: 'invalid namespace'  },
       { uri: '/validNamespace/',                            condition: 'no metric'          },
       { uri: '/validNamespace/metric?region=invalidRegion', condition: 'invalid region'  },
-      { uri: '/validNamespace/metric?region=mockRegion&stat=invalidStat', condition: 'invalidStat'  }
+      { uri: '/validNamespace/metric?region=mockRegion&stat=invalidStat', condition: 'invalidStat'  },
+      { uri: '/validNamespace/metric?region=mockRegion&period=300', condition: 'invalidPeriod'  }
     ];
     beforeEach(() => status.mockClear());
     assertions404.forEach((assertion) => {
@@ -69,6 +72,7 @@ describe('stat', () => {
     test('metric', () => { expect(mockCloudwatchGet).toHaveBeenCalledWith(expect.objectContaining({ metric: 'mockMetric' })); });
     test('region', () => { expect(mockCloudwatchGet).toHaveBeenCalledWith(expect.objectContaining({ region: 'mockRegion' })); });
     test('stat', () => { expect(mockCloudwatchGet).toHaveBeenCalledWith(expect.objectContaining({ stat: ['mockStat'] })); });
+    test('period', () => { expect(mockCloudwatchGet).toHaveBeenCalledWith(expect.objectContaining({ period: 300 })); });
     test('start', () => {
       const expected = new Date(Date.now() - 99999),
         actual = new Date(mockCloudwatchGet.mock.calls[0][0].start);
@@ -91,6 +95,7 @@ describe('stat', () => {
     });
     test('region is eu-west-2', () => { expect(mockCloudwatchGet).toHaveBeenCalledWith(expect.objectContaining({ region: 'eu-west-2' })); });
     test('stat is Average', () => { expect(mockCloudwatchGet).toHaveBeenCalledWith(expect.objectContaining({ stat: ['Average'] })); });
+    test('period is 300 ( 5 min )', () => { expect(mockCloudwatchGet).toHaveBeenCalledWith(expect.objectContaining({ period: 300 })); });
   });
 
   describe('response', () => {
@@ -114,6 +119,7 @@ describe('stat', () => {
             regex: 'poop',
             region: 'mockRegion',
             stat: ['mockStat'],
+            period: 300,
             start: expect.anything()
           }
         }));

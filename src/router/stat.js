@@ -2,6 +2,7 @@ const router = require('express').Router(),
   regions = require('../data/regions'),
   namespaces = require('../data/namespaces'),
   statistics = require('../data/statistics'),
+  periods = require('../data/periods'),
   isValue = require('../util/isValue'),
   getDimensions = require('../util/getDimensions'),
   cloudwatch = require('../aws/cloudwatch');
@@ -31,6 +32,16 @@ router.route('/:namespace/:metric').get((req, res) => {
     }
   }
 
+  let period = 300;
+  if(req.query.period) {  // TODO DRY!
+    req.query.period = parseInt(req.query.period);
+    if(isValue(req.query.period, periods)) {
+      period = req.query.period;
+    } else {
+      return res.status(404).send(`the period "${req.query.period}" is invalid`);
+    }
+  }
+
   req.params.namespace = req.params.namespace.toUpperCase();
   getDimensions(req.params.namespace, region, req.query.regex || null).then((dimensions) => {
     const options = {
@@ -40,7 +51,8 @@ router.route('/:namespace/:metric').get((req, res) => {
       dimensions: dimensions,
       region: region,
       stat: [stat],
-      regex: req.query.regex || null
+      regex: req.query.regex || null,
+      period: period
     };
     cloudwatch.get(options)
       .then(response => res.json({
