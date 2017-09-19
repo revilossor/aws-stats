@@ -33,7 +33,7 @@ router.route('/:namespace/:metric').get((req, res) => {
   }
 
   let period = 300;
-  if(req.query.period) {  // TODO DRY!
+  if(req.query.period) {
     req.query.period = parseInt(req.query.period);
     if(isValue(req.query.period, periods)) {
       period = req.query.period;
@@ -42,12 +42,20 @@ router.route('/:namespace/:metric').get((req, res) => {
     }
   }
 
+  let start = new Date(Date.now() - 3600000);               // default start is an hour age
+  if(req.query.since) {
+    var since = new Date(Date.parse(req.query.since));      // if there is a 'since' in qs, parse it to a date
+    if(!isNaN(since)) { start = since; }                    // .. and use it as the start.
+  } else if(req.query.age) {                                // ELSE if there is an age...
+    start = new Date(Date.now() - parseInt(req.query.age)); // ...make a start date from that.
+  }
+
   req.params.namespace = req.params.namespace.toUpperCase();
   getDimensions(req.params.namespace, region, req.query.regex || null).then((dimensions) => {
     const options = {
       namespace: `AWS/${req.params.namespace}`,
       metric: req.params.metric,
-      start: new Date(Date.now() - ((req.query.age) ? parseInt(req.query.age) : 3600000)),
+      start: start,
       dimensions: dimensions,
       region: region,
       stat: [stat],
