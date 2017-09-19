@@ -82,6 +82,33 @@ describe('stat', () => {
     test('dimensions', () => { expect(mockCloudwatchGet).toHaveBeenCalledWith(expect.objectContaining({ dimensions: ['mockDimensions'] })); });
   });
 
+  describe('since', () => {
+
+    const now = new Date();
+
+    beforeEach(() => {
+      mockCloudwatchGet.mockClear();
+    });
+
+    test('is used if valid ISO date', (done) => {
+      request(app).get(`/validNamespace/mockMetric?since=${now.toISOString()}`).then(() => {
+        expect(mockCloudwatchGet).toHaveBeenCalledWith(expect.objectContaining({ start: now }));
+        done();
+      });
+    });
+
+    test('uses default if invalid ISO date', (done) => {
+      request(app).get('/validNamespace/mockMetric?since=invalid').then(() => {
+        const expected = new Date(Date.now() - 3600000),
+          actual = new Date(mockCloudwatchGet.mock.calls[0][0].start);
+        const isWithinTolerance = (expected - actual > -(dateTolerance / 2)) && (expected - actual < (dateTolerance / 2));
+        expect(isWithinTolerance).toBe(true);
+        done();
+      });
+    });
+
+  });
+
   describe('default params', () => {
     beforeAll((done) => {
       mockCloudwatchGet.mockClear();
