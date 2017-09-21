@@ -2,7 +2,8 @@ const router = require('express').Router(),
   cloudwatch = require('../aws/cloudwatch'),
   regions = require('../data/regions'),
   namespaces = require('../data/namespaces'),
-  isValue = require('../util/isValue');
+  isValue = require('../util/isValue'),
+  describe = require('../aws/describe');
 
 /*
   lists all available regions and namespaces
@@ -14,6 +15,13 @@ router.route('/').get((req, res) => {
     statistics: require('../data/statistics'),
     periods: require('../data/periods')
   });
+});
+
+/*
+  list all instances
+*/
+router.route('/instances').get((req, res) => {
+  describe.EC2('eu-west-2').then(response => res.json(response));
 });
 
 /*

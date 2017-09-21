@@ -38,6 +38,7 @@ module.exports = {
     });
   },
   EC2: (region) => {
+    let nameTags;
     return tryCacheGet('EC2', maxCacheAge, region, (region) => {
       return new Promise((resolve, reject) => {
         const ec2 = new AWS.EC2({ apiVersion: '2016-11-15', region: region });
@@ -47,7 +48,10 @@ module.exports = {
             resolve(
               data.Reservations.map((instance) => {
                 instance = instance.Instances[0];
-                instance.InstanceName = instance.Tags.filter(tag => tag.Key == 'Name')[0].Value;
+                nameTags = instance.Tags.filter(tag => tag.Key.toLowerCase() == 'name');
+                if(nameTags.length > 0) {
+                  instance.InstanceName = nameTags[0].Value;
+                }
                 return instance;
               })
             );
